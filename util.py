@@ -1,12 +1,12 @@
 import tensorflow as tf
 
-def build_model(x, y, training=True, reuse=None, num_filters=16, ksize=4, stride=2):
+def build_model(x, y, training=True, reuse=None, num_filters=16, ksize=3, stride=2):
     with tf.variable_scope('model'):
         x = tf.reshape(x, [-1, 28, 28, 1])
         x = tf.layers.conv2d(x, num_filters, ksize, stride,
                             use_bias=False, padding='same',
                             reuse=reuse, name='conv1')
-        x = tf.layers.batch_normalization(x,
+        x = tf.layers.batch_normalization(x, epsilon=1e-6,
                             scale=False, training=training,
                             reuse=reuse, name='bn1')
         x = tf.nn.relu(x, name='relu1')
