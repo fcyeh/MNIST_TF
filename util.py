@@ -1,20 +1,23 @@
 import tensorflow as tf
 
-def build_model(x, y, training=True, reuse=None, num_filters=16, ksize=3, stride=2):
-    with tf.variable_scope('model'):
-        x = tf.reshape(x, [-1, 28, 28, 1])
+def conv_bn_relu(x, num_filters, ksize=3, stride=2, reuse=None, training=True, name='conv'):
+    with tf.variable_scope(name):
         x = tf.layers.conv2d(x, num_filters, ksize, stride,
                             use_bias=False, padding='same',
-                            reuse=reuse, name='conv1')
-        x = tf.layers.batch_normalization(x, epsilon=1e-6,
+                            reuse=reuse, name='conv')
+        x = tf.layers.batch_normalization(x, epsilon=1e-6, momentum=0.999,
                             scale=False, training=training,
-                            reuse=reuse, name='bn1')
-        x = tf.nn.relu(x, name='relu1')
+                            reuse=reuse, name='bn')
+        return tf.nn.relu(x, name='relu')
 
-        x = tf.layers.conv2d(x, num_filters, ksize, stride, padding='same',
-                            reuse=reuse, name='conv2')
+def build_model(x, y, training=True, reuse=None):
+    with tf.variable_scope('model'):
+        x = tf.reshape(x, [-1, 28, 28, 1])
+        conv1 = conv_bn_relu(x, 16, training=training, reuse=reuse, name='conv1')
+        conv2 = conv_bn_relu(conv1, 16, training=training, reuse=reuse, name='conv2')
 
-        logits = tf.layers.conv2d(x, 10, x.shape[1:3].as_list(), reuse=reuse, name='logits')
+        logits = tf.layers.conv2d(conv2, 10, conv2.shape[1:3].as_list(),
+                            reuse=reuse, name='logits')
         y = tf.reshape(y, [-1, 1, 1, 10], name='labels')
 
         loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=logits))

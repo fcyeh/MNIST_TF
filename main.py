@@ -14,7 +14,7 @@ with tf.control_dependencies(update_ops):
     train_step = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss_train)
 
 batch_size = 64
-num_iter = 1000
+num_iter = 10000
 with tf.Session() as sess:
     init = tf.global_variables_initializer()
     sess.run(init)
