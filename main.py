@@ -25,7 +25,5 @@ with tf.Session() as sess:
         img, lbl = mnist.train.next_batch(batch_size)
         sess.run(train_step, feed_dict={x: img, y: lbl})
 
-    print('accu_train = %.4f'
-            % sess.run(accu_train, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
     print('accu_val = %.4f'
             % sess.run(accu_val, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
